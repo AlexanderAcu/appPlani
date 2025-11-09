@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Niveles - Planificacion CF</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="border-b">
+    <div class="container py-4 sm:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <img src="logo.png" alt="Logo CF" class="logo">
+        <div>
+          <h1 class="title text-lg sm:text-xl lg:text-2xl" id="pageTitle">Niveles de Entrenamiento</h1>
+          <p id="currentMonth" class="subtitle text-gray-200 text-sm"></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="musculacion.html" class="btn-secondary text-sm sm:text-base">
+          <span class="hidden sm:inline">← Volver a Musculación</span>
+          <span class="sm:hidden">← Musculación</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container space-y-6 pb-16 pt-6">
+    <section class="card">
+      <div class="text-center mb-8">
+        <h2 class="section-title mb-4" id="categoryTitle">Selecciona tu nivel</h2>
+        <p class="note" id="categoryDescription">Elige el nivel que mejor se adapte a tu experiencia</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Nivel 1 -->
+        <div class="card bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:border-green-300 transition-all cursor-pointer" onclick="redirectToPlanning('nivel1')">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🌱</div>
+            <h3 class="text-xl font-semibold text-green-700 mb-2">Nivel 1</h3>
+            <p class="text-green-600 text-sm"></p>
+          </div>
+        </div>
+
+        <!-- Nivel 2 -->
+        <div class="card bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:border-orange-300 transition-all cursor-pointer" onclick="redirectToPlanning('nivel2')">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">💪</div>
+            <h3 class="text-xl font-semibold text-orange-700 mb-2">Nivel 2</h3>
+            <p class="text-orange-600 text-sm"></p>
+          </div>
+        </div>
+
+        <!-- Nivel 3 -->
+        <div class="card bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:border-red-300 transition-all cursor-pointer" onclick="redirectToPlanning('nivel3')">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🔥</div>
+            <h3 class="text-xl font-semibold text-red-700 mb-2">Nivel 3</h3>
+            <p class="text-red-600 text-sm"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t mt-8">
+    <div class="container mx-auto py-6 px-4 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+      <!-- Marca de la App -->
+      <div>
+        <h2 class="font-bold text-sky-600 text-lg">Planificación CF</h2>
+        <p class="text-slate-500 text-sm">© 2025 Tu Empresa Fitness. Todos los derechos reservados.</p>
+      </div>
+
+      <!-- Datos  -->
+      <div class="mt-4 sm:mt-0">
+        <p class="text-slate-500 text-sm">
+          Desarrollado por 
+          <a href="https://tusitio.com" target="_blank" rel="noopener" class="text-sky-600 hover:underline">
+            ZonaTech
+          </a>
+        </p>
+        <p class="text-slate-500 text-sm">📧 zonazeroale10@gmail.com | 📱 +54 9 351 5168272</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Obtener parámetros de la URL
+    function getUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return {
+        categoria: urlParams.get('categoria') || 'musculacion',
+        subcategoria: urlParams.get('subcategoria') || ''
+      };
+    }
+
+    // Configurar el contenido según la subcategoría
+    function setupPage() {
+      const params = getUrlParams();
+      const subcategoria = params.subcategoria;
+      
+      const subcategoryTitles = {
+        'hipertrofia': 'Hipertrofia',
+        'fuerza': 'Fuerza',
+        'definicion': 'Definición',
+        'powerlifting': 'Powerlifting',
+        'funcional': 'Funcional',
+        'principiantes': 'Principiantes',
+        'volumen': 'Volumen',
+        'resistencia': 'Fuerza Resistencia',
+        'especializacion': 'Especialización'
+      };
+
+      const subcategoryDescriptions = {
+        'hipertrofia': 'Entrenamientos enfocados en el aumento de masa muscular',
+        'fuerza': 'Rutinas para desarrollo de fuerza máxima',
+        'definicion': 'Planes para reducción de grasa y definición muscular',
+        'powerlifting': 'Especialización en sentadilla, press banca y peso muerto',
+        'funcional': 'Entrenamiento funcional y movilidad',
+        'principiantes': 'Rutinas para comenzar en la musculación',
+        'volumen': 'Entrenamientos de alto volumen',
+        'resistencia': 'Combinación de fuerza y resistencia',
+        'especializacion': 'Enfoque en grupos musculares específicos'
+      };
+
+      if (subcategoria && subcategoryTitles[subcategoria]) {
+        document.getElementById('pageTitle').textContent = `${subcategoryTitles[subcategoria]} - Niveles`;
+        document.getElementById('categoryTitle').textContent = `Niveles de ${subcategoryTitles[subcategoria]}`;
+        document.getElementById('categoryDescription').textContent = subcategoryDescriptions[subcategoria];
+      }
+    }
+
+    // Redirigir a planificaciones con el nivel seleccionado
+    function redirectToPlanning(nivel) {
+      const params = getUrlParams();
+      const url = `planificaciones.html?categoria=${params.categoria}&subcategoria=${params.subcategoria}&nivel=${nivel}`;
+      window.location.href = url;
+    }
+
+    // Configurar fecha actual
+    function setCurrentMonth(){
+      const el = document.querySelector("#currentMonth");
+      if(!el) return;
+      const txt = new Intl.DateTimeFormat("es-AR",{month:"long",year:"numeric"}).format(new Date());
+      el.textContent = txt.charAt(0).toUpperCase()+txt.slice(1);
+    }
+
+    // Inicializar página
+    document.addEventListener('DOMContentLoaded', function() {
+      setCurrentMonth();
+      setupPage();
+    });
+  </script>
+</body>
+</html>

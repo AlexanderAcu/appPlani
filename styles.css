@@ -22,7 +22,12 @@ body {
 .container {
   max-width: 70rem; /* más angosto */
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 0.75rem;
+}
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1rem;
+  }
 }
 
 
@@ -32,12 +37,17 @@ body {
   border: none;
   border-radius: 1.25rem;
   box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  padding: 1.5rem;
+  padding: 1rem;
   color: #18181b;
   transition: box-shadow 0.3s, transform 0.3s;
   max-width: 48rem;      
   margin-left: auto;
   margin-right: auto;
+}
+@media (min-width: 640px) {
+  .card {
+    padding: 1.5rem;
+  }
 }
 .card:hover {
   transform: translateY(-4px);
@@ -95,10 +105,17 @@ footer a { color: var(--brand-yellow-dark) !important; }
   border-radius: 9999px;
   border: none;
   font-weight: 600;
-  padding: 0.55rem 1.1rem;
+  padding: 0.5rem 0.875rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
   transition: box-shadow 0.2s, background 0.3s;
+  font-size: 0.875rem;
 } 
+@media (min-width: 640px) {
+  .tab {
+    padding: 0.55rem 1.1rem;
+    font-size: 1rem;
+  }
+}
 .tab:hover {
   background: linear-gradient(90deg, #353945 0%, #23272f 100%);
   box-shadow: 0 6px 16px rgba(0,0,0,0.18);
@@ -180,6 +197,100 @@ footer {
   transform: translateY(-2px) scale(1.04);
 }
 
+.btn-primary {
+  background: linear-gradient(90deg, #0ea5e9 0%, #0284c7 100%);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  border: none;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+}
+@media (min-width: 640px) {
+  .btn-primary {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+.btn-primary:hover {
+  background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  white-space: nowrap;
+}
+@media (min-width: 640px) {
+  .btn-secondary {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    min-height: 38px;
+  }
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-tool {
+  background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #475569;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 36px;
+  white-space: nowrap;
+}
+@media (min-width: 640px) {
+  .btn-tool {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+.btn-tool:hover {
+  background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 100%);
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(71, 85, 105, 0.15);
+}
+
 header {
   background-image: url(banner.png) !important;
   background-size: cover !important;
@@ -228,12 +339,20 @@ footer h2 {
   background: #23272f;
   color: #fff;
   border-radius: 1rem;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  padding: 1.5rem 1rem 1rem 1rem;
   max-width: 420px;
-  width: 100%;
+  width: 90%;
+  margin: 0 1rem;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   position: relative;
   text-align: center;
+}
+@media (min-width: 640px) {
+  #modalEjercicio .modal-content {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    width: 100%;
+    margin: 0;
+  }
 }
 #modalEjercicio input[type="text"] {
   color: #fff;
@@ -292,14 +411,22 @@ footer h2 {
   background: #fff;
   color: #18181b;
   border-radius: 1.25rem;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1rem;
   max-width: 350px;
-  width: 100%;
+  width: 90%;
+  margin: 0 1rem;
   box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  #modalCalculadora .modal-content {
+    padding: 2rem 1.5rem;
+    width: 100%;
+    margin: 0;
+  }
 }
 #modalCalculadora .close-modal {
   position: absolute;

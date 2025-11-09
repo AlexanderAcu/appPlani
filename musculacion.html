@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Musculación - Planificacion CF</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="border-b">
+    <div class="container py-4 sm:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <img src="logo.png" alt="Logo CF" class="logo">
+        <div>
+          <h1 class="title text-lg sm:text-xl lg:text-2xl">Musculación</h1>
+          <p id="currentMonth" class="subtitle text-gray-200 text-sm"></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="index.html" class="btn-secondary text-sm sm:text-base">
+          <span class="hidden sm:inline">← Volver al inicio</span>
+          <span class="sm:hidden">← Inicio</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container space-y-6 pb-16 pt-6">
+    <section class="card">
+      <div class="text-center mb-8">
+        <h2 class="section-title mb-4">Selecciona tu tipo de entrenamiento</h2>
+        <p class="note">Elige el enfoque que mejor se adapte a tus objetivos</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Hipertrofia -->
+        <div class="card bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:border-red-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=hipertrofia'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">💪</div>
+            <h3 class="text-xl font-semibold text-red-700 mb-2">Hipertrofia Hombres</h3>
+            <p class="text-red-600 text-sm">Enfocado en el aumento de masa muscular</p>
+          </div>
+        </div>
+
+        <!-- Fuerza -->
+        <div class="card bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:border-orange-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=fuerza'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🏋️‍♂️</div>
+            <h3 class="text-xl font-semibold text-orange-700 mb-2">Hipertrofia Mujeres</h3>
+            <p class="text-orange-600 text-sm">Enfocado en el aumento de masa muscular</p>
+          </div>
+        </div>
+
+        <!-- Definición -->
+        <div class="card bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:border-green-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=definicion'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🔥</div>
+            <h3 class="text-xl font-semibold text-green-700 mb-2">Adaptación</h3>
+            <p class="text-green-600 text-sm">Recomendado para principiantes</p>
+          </div>
+        </div>
+
+        <!-- Powerlifting -->
+        <div class="card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:border-blue-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=powerlifting'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🏆</div>
+            <h3 class="text-xl font-semibold text-blue-700 mb-2">Full Body</h3>
+            <p class="text-blue-600 text-sm">Entrenamiento para todo el cuerpo</p>
+          </div>
+        </div>
+
+        <!-- Funcional -->
+        <div class="card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:border-purple-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=funcional'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🤸‍♂️</div>
+            <h3 class="text-xl font-semibold text-purple-700 mb-2">Piernas y Glúteos</h3>
+            <p class="text-purple-600 text-sm">Entrenamiento específico para piernas y glúteos</p>
+          </div>
+        </div>
+
+        <!-- Principiantes -->
+        <div class="card bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 hover:border-teal-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=principiantes'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🌱</div>
+            <h3 class="text-xl font-semibold text-teal-700 mb-2">Cardio y Zona media</h3>
+            <p class="text-teal-600 text-sm">Rutinas de cardio y entrenamiento de la zona media</p>
+          </div>
+        </div>
+
+        <!-- Volumen 
+        <div class="card bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 hover:border-indigo-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=volumen'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">📈</div>
+            <h3 class="text-xl font-semibold text-indigo-700 mb-2">Volumen</h3>
+            <p class="text-indigo-600 text-sm">Alto volumen de entrenamiento</p>
+          </div>
+        </div>
+
+         Fuerza Resistencia 
+        <div class="card bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:border-pink-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=resistencia'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">⚡</div>
+            <h3 class="text-xl font-semibold text-pink-700 mb-2">Fuerza Resistencia</h3>
+            <p class="text-pink-600 text-sm">Combinación de fuerza y resistencia</p>
+          </div>
+        </div>
+
+        Especialización
+        <div class="card bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:border-yellow-300 transition-all cursor-pointer" onclick="window.location.href='niveles.html?categoria=musculacion&subcategoria=especializacion'">
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">🎯</div>
+            <h3 class="text-xl font-semibold text-yellow-700 mb-2">Especialización</h3>
+            <p class="text-yellow-600 text-sm">Enfoque en grupos musculares específicos</p>
+          </div>
+        </div>
+      </div> -->
+    </section>
+  </main>
+
+  <footer class="border-t mt-8">
+    <div class="container mx-auto py-6 px-4 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+      <!-- Marca de la App -->
+      <div>
+        <h2 class="font-bold text-sky-600 text-lg">Planificación CF</h2>
+        <p class="text-slate-500 text-sm">© 2025 Tu Empresa Fitness. Todos los derechos reservados.</p>
+      </div>
+
+      <!-- Datos  -->
+      <div class="mt-4 sm:mt-0">
+        <p class="text-slate-500 text-sm">
+          Desarrollado por 
+          <a href="https://tusitio.com" target="_blank" rel="noopener" class="text-sky-600 hover:underline">
+            ZonaTech
+          </a>
+        </p>
+        <p class="text-slate-500 text-sm">📧 zonazeroale10@gmail.com | 📱 +54 9 351 5168272</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function setCurrentMonth(){
+      const el = document.querySelector("#currentMonth");
+      if(!el) return;
+      const txt = new Intl.DateTimeFormat("es-AR",{month:"long",year:"numeric"}).format(new Date());
+      el.textContent = txt.charAt(0).toUpperCase()+txt.slice(1);
+    }
+    setCurrentMonth();
+  </script>
+</body>
+</html>

@@ -22,12 +22,78 @@ const days = [
 ];
 
 let cache = {};
+let currentCategory = "";
+let currentSubcategory = "";
+let currentLevel = "";
+
+// Obtener parámetros de la URL
+function getUrlParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return {
+    categoria: urlParams.get('categoria') || 'clase-crossfit', // default
+    subcategoria: urlParams.get('subcategoria') || null,
+    nivel: urlParams.get('nivel') || null
+  };
+}
+
+// Generar ID del documento basado en categoría, subcategoría y nivel
+function getDocumentId() {
+  const params = getUrlParams();
+  currentCategory = params.categoria;
+  currentSubcategory = params.subcategoria;
+  currentLevel = params.nivel;
+  
+  if (currentLevel && currentSubcategory) {
+    return `${currentCategory}-${currentSubcategory}-${currentLevel}`;
+  } else if (currentSubcategory) {
+    return `${currentCategory}-${currentSubcategory}`;
+  }
+  return currentCategory;
+}
+
+// Obtener título para mostrar en la página
+function getCategoryTitle() {
+  const params = getUrlParams();
+  const titles = {
+    'crossfit-atletas': 'CrossFit Atletas',
+    'clase-crossfit': 'Clase CrossFit',
+    'musculacion': 'Musculación'
+  };
+  
+  const subcategoryTitles = {
+    'hipertrofia': 'Hipertrofia',
+    'fuerza': 'Fuerza',
+    'definicion': 'Definición',
+    'powerlifting': 'Powerlifting',
+    'funcional': 'Funcional',
+    'principiantes': 'Principiantes',
+    'volumen': 'Volumen',
+    'resistencia': 'Fuerza Resistencia',
+    'especializacion': 'Especialización'
+  };
+
+  const levelTitles = {
+    'nivel1': 'Nivel 1',
+    'nivel2': 'Nivel 2',
+    'nivel3': 'Nivel 3'
+  };
+  
+  let title = titles[params.categoria] || 'Planificaciones';
+  if (params.subcategoria) {
+    title += ` - ${subcategoryTitles[params.subcategoria] || params.subcategoria}`;
+  }
+  if (params.nivel) {
+    title += ` - ${levelTitles[params.nivel] || params.nivel}`;
+  }
+  return title;
+}
 
 function setCurrentMonth(){
   const el=$("#currentMonth"); if(!el) return;
   const txt=new Intl.DateTimeFormat("es-AR",{month:"long",year:"numeric"}).format(new Date());
   el.textContent = txt.charAt(0).toUpperCase()+txt.slice(1);
 }
+
 function getTodayKey(){
   const g=new Date().getDay();
   const f=days.find(d=>d.dow===g);
@@ -68,6 +134,45 @@ function renderDay(dayKey){
 document.addEventListener("DOMContentLoaded", async ()=>{
   console.log("[public] projectId:", firebaseConfig.projectId);
   setCurrentMonth();
+  
+  // Actualizar título de la página
+  const titleElement = document.querySelector('.title');
+  if (titleElement) {
+    titleElement.textContent = getCategoryTitle();
+  }
+  
+  // Agregar botón de volver si no estamos en la página principal
+  const params = getUrlParams();
+  if (params.categoria !== 'clase-crossfit' || params.subcategoria || params.nivel) {
+    const header = document.querySelector('header .container');
+    if (header && !header.querySelector('.back-link')) {
+      const backLink = document.createElement('a');
+      
+      // Determinar la URL de retorno
+      if (params.nivel && params.subcategoria) {
+        backLink.href = `niveles.html?categoria=${params.categoria}&subcategoria=${params.subcategoria}`;
+        backLink.textContent = '← Volver a Niveles';
+      } else if (params.subcategoria) {
+        backLink.href = 'musculacion.html';
+        backLink.textContent = '← Volver a Musculación';
+      } else {
+        backLink.href = 'index.html';
+        backLink.textContent = '← Volver al inicio';
+      }
+      
+      backLink.className = 'btn-secondary back-link text-sm sm:text-base';
+      
+      // Texto responsive
+      const fullText = backLink.textContent;
+      const shortText = fullText.replace('Volver a ', '← ').replace('Volver al ', '← ');
+      backLink.innerHTML = `
+        <span class="hidden sm:inline">${fullText}</span>
+        <span class="sm:hidden">${shortText}</span>
+      `;
+      
+      header.appendChild(backLink);
+    }
+  }
 
   // Tabs
   const tabs=$("#tabs"); tabs.innerHTML="";
@@ -78,8 +183,11 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     tabs.appendChild(b);
   });
 
-  // Primera lectura + realtime
-  const ref = doc(db,"plans","week");
+  // Primera lectura + realtime con el documento correcto
+  const documentId = getDocumentId();
+  const ref = doc(db,"plans", documentId);
+  console.log("[public] Using document ID:", documentId);
+  
   const snap0 = await getDoc(ref);
   cache = snap0.exists()? snap0.data() : {};
   console.log("[public] first getDoc:", cache);

@@ -11,15 +11,20 @@
 </head>
 <body>
   <header class="border-b">
-    <div class="container py-6 flex items-center justify-between">
-      <div class="flex items-center gap-3">
+    <div class="container py-4 sm:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
         <img src="logo.png" alt="Logo CF" class="logo">
         <div>
-          <h1 class="title">Planificacion CF — Admin</h1>
-          <p id="currentMonth" class="subtitle"></p>
+          <h1 class="title text-lg sm:text-xl lg:text-2xl">Planificacion CF — Admin</h1>
+          <p id="currentMonth" class="subtitle text-sm"></p>
         </div>
       </div>
-      <a href="index.html" class="link">Ver público</a>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="index.html" class="btn-secondary text-sm sm:text-base">
+          <span class="hidden sm:inline">Ver público</span>
+          <span class="sm:hidden">Público</span>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -29,10 +34,49 @@
         <h2 class="section-title">Editor de Planificaciones</h2>
       </div>
 
+      <!-- Selección de Categoría -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <label class="label min-w-fit">Categoría:</label>
+        <select id="categorySelect" class="input w-full sm:max-w-xs">
+          <option value="">— Seleccionar —</option>
+          <option value="clase-crossfit">Clase CrossFit</option>
+          <option value="crossfit-atletas">CrossFit Atletas</option>
+          <option value="musculacion">Musculación</option>
+        </select>
+      </div>
+
+      <!-- Selección de Subcategoría (solo para musculación) -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3" id="subcategoryContainer" style="display: none;">
+        <label class="label min-w-fit">Subcategoría:</label>
+        <select id="subcategorySelect" class="input w-full sm:max-w-xs">
+          <option value="">— Seleccionar —</option>
+          <option value="hipertrofia">Hipertrofia</option>
+          <option value="fuerza">Fuerza</option>
+          <option value="definicion">Definición</option>
+          <option value="powerlifting">Powerlifting</option>
+          <option value="funcional">Funcional</option>
+          <option value="principiantes">Principiantes</option>
+          <option value="volumen">Volumen</option>
+          <option value="resistencia">Fuerza Resistencia</option>
+          <option value="especializacion">Especialización</option>
+        </select>
+      </div>
+
+      <!-- Selección de Nivel (solo para musculación) -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3" id="levelContainer" style="display: none;">
+        <label class="label min-w-fit">Nivel:</label>
+        <select id="levelSelect" class="input w-full sm:max-w-xs">
+          <option value="">— Seleccionar —</option>
+          <option value="nivel1">Nivel 1 - Principiante</option>
+          <option value="nivel2">Nivel 2 - Intermedio</option>
+          <option value="nivel3">Nivel 3 - Avanzado</option>
+        </select>
+      </div>
+
       <!-- Elegí el día -->
-      <div class="flex items-center gap-3">
-        <label class="label">Elegí un día:</label>
-        <select id="daySelect" class="input" style="max-width: 220px;">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <label class="label min-w-fit">Elegí un día:</label>
+        <select id="daySelect" class="input w-full sm:max-w-xs">
           <option value="">— Seleccionar —</option>
           <option value="monday">Lunes</option>
           <option value="tuesday">Martes</option>
@@ -46,8 +90,16 @@
       <!-- Tabs de días -->
       <div class="flex gap-2 flex-wrap" id="tabs"></div>
 
-      <p class="muted">Editando: <b id="dayLabel">—</b></p>
+      <p class="muted">
+        Editando: <b id="categoryLabel">—</b> - <b id="dayLabel">—</b>
+        <span id="subcategoryLabel" style="display: none;"> (<b id="subcategoryText">—</b></span>
+        <span id="levelLabel" style="display: none;"> - <b id="levelText">—</b></span>
+        <span id="subcategoryLabel" style="display: none;">)</span>
+      </p>
       <input type="hidden" id="dayKey" value="" />
+      <input type="hidden" id="currentCategory" value="" />
+      <input type="hidden" id="currentSubcategory" value="" />
+      <input type="hidden" id="currentLevel" value="" />
 
       <textarea id="planTextarea" rows="12" class="textarea" placeholder="Elegí un día para empezar a escribir..." disabled></textarea>
 

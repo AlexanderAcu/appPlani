@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Planificacion CF</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="border-b">
+    <div class="container py-4 sm:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <img src="logo.png" alt="Logo CF" class="logo">
+        <div>
+          <h1 class="title text-lg sm:text-xl lg:text-2xl">Planificacion CF</h1>
+          <p id="currentMonth" class="subtitle text-gray-200 text-sm"></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="buscarEjercicioBtn" class="btn-secondary text-xs sm:text-base">
+          <span class="sm:hidden"></span>
+          <span class="hidden sm:inline">🔍 Buscar ejercicio</span>
+        </button>
+        <button id="abrirCalculadoraBtn" class="btn-secondary text-xs sm:text-base">
+          <span class="sm:hidden"></span>
+          <span class="hidden sm:inline">🧮 Calculadora de %</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container space-y-6 pb-16 pt-6">
+    <div id="tabs" class="flex gap-2 flex-wrap"></div>
+
+    <section class="card">
+      <article id="studentContent" class="prose max-w-none"></article>
+      <p class="note">Todas las consultas las hacemos por el grupo</p>
+    </section>
+  </main>
+
+  <!-- Modal de búsqueda de ejercicios -->
+  <div id="modalEjercicio">
+    <div class="modal-content">
+      <button class="close-modal" title="Cerrar">&times;</button>
+      <h2>Buscar ejercicio en YouTube</h2>
+      <input type="text" id="inputEjercicio" placeholder="Ej: sentadilla, push up...">
+      <button id="btnBuscarVideo" class="btn-primary" style="margin-top:0.5rem;">Buscar</button>
+      <div class="video-result" id="videoResult"></div>
+    </div>
+  </div>
+
+  <!-- Modal Calculadora de Porcentaje -->
+  <div id="modalCalculadora" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" title="Cerrar">&times;</button>
+      <h2>Calculadora de Porcentaje</h2>
+      <label for="inputPesoMax">Peso máximo (kg):</label>
+      <input type="number" id="inputPesoMax" min="1" placeholder="Ej: 100">
+      <label for="inputPorcentaje">Porcentaje (%):</label>
+      <input type="number" id="inputPorcentaje" min="1" max="100" placeholder="Ej: 80">
+      <button id="btnCalcularPorcentaje" class="btn-primary" style="margin-top:0.5rem;">Calcular</button>
+      <div id="resultadoPorcentaje" style="margin-top:1rem;font-weight:bold;"></div>
+    </div>
+  </div>
+
+  <footer class="border-t mt-8">
+    <div class="container mx-auto py-6 px-4 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+      <!-- Marca de la App -->
+      <div>
+        <h2 class="font-bold text-sky-600 text-lg">Planificación CF</h2>
+        <p class="text-slate-500 text-sm">© 2025 Tu Empresa Fitness. Todos los derechos reservados.</p>
+      </div>
+
+      <!-- Datos  -->
+      <div class="mt-4 sm:mt-0">
+        <p class="text-slate-500 text-sm">
+          Desarrollado por 
+          <a href="https://tusitio.com" target="_blank" rel="noopener" class="text-sky-600 hover:underline">
+            ZonaTech
+          </a>
+        </p>
+        <p class="text-slate-500 text-sm">📧 zonazeroale10@gmail.com | 📱 +54 9 351 5168272</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="app-public.js"></script>
+</body>
+</html>
