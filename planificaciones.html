@@ -11,22 +11,22 @@
 </head>
 <body>
   <header class="border-b">
-    <div class="container py-4 sm:py-6 flex items-center justify-between">
-      <div class="flex items-center gap-2 sm:gap-3">
-        <img src="logo.png" alt="Logo CF" class="logo">
-        <div>
-          <h1 class="title text-lg sm:text-xl lg:text-2xl">Planificacion CF</h1>
-          <p id="currentMonth" class="subtitle text-gray-200 text-sm"></p>
+    <div class="container py-3 sm:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        <img src="logo.png" alt="Logo CF" class="logo flex-shrink-0">
+        <div class="min-w-0">
+          <h1 class="title text-base sm:text-xl lg:text-2xl truncate">Planificacion CF</h1>
+          <p id="currentMonth" class="subtitle text-gray-200 text-xs sm:text-sm"></p>
         </div>
       </div>
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button id="buscarEjercicioBtn" class="btn-secondary text-xs sm:text-base">
-          <span class="sm:hidden"></span>
-          <span class="hidden sm:inline">🔍 Buscar ejercicio</span>
+      <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+        <button id="buscarEjercicioBtn" class="btn-secondary text-xs sm:text-base px-2 sm:px-4 py-1 sm:py-2">
+          <span class="md:hidden">🔍 Buscar</span>
+          <span class="hidden md:inline">🔍 Buscar ejercicio</span>
         </button>
-        <button id="abrirCalculadoraBtn" class="btn-secondary text-xs sm:text-base">
-          <span class="sm:hidden"></span>
-          <span class="hidden sm:inline">🧮 Calculadora de %</span>
+        <button id="abrirCalculadoraBtn" class="btn-secondary text-xs sm:text-base px-2 sm:px-4 py-1 sm:py-2">
+          <span class="md:hidden">🧮 Calc</span>
+          <span class="hidden md:inline">🧮 Calculadora de %</span>
         </button>
       </div>
     </div>

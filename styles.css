@@ -259,6 +259,47 @@ footer {
   transform: translateY(-1px);
 }
 
+/* Estilos específicos para botones del header en móvil */
+@media (max-width: 639px) {
+  header .btn-secondary {
+    min-width: 44px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    background: rgba(21, 113, 250, 0.1);
+    border-color: rgba(21, 113, 250, 0.3);
+    color: var(--brand-yellow);
+    white-space: nowrap;
+  }
+  
+  header .btn-secondary:hover {
+    background: rgba(21, 113, 250, 0.2);
+    color: var(--brand-yellow-dark);
+  }
+}
+  
+/* En pantallas muy pequeñas, layout vertical */
+@media (max-width: 400px) {
+  header .container {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  header .container > div:first-child {
+    justify-content: center;
+  }
+  
+  header .container > div:last-child {
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  header .btn-secondary {
+    flex: 1;
+    max-width: 120px;
+  }
+}
+
 .btn-tool {
   background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 100%);
   color: #475569;
