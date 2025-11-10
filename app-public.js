@@ -61,15 +61,12 @@ function getCategoryTitle() {
   };
   
   const subcategoryTitles = {
-    'hipertrofia': 'Hipertrofia',
-    'fuerza': 'Fuerza',
-    'definicion': 'Definición',
-    'powerlifting': 'Powerlifting',
-    'funcional': 'Funcional',
-    'principiantes': 'Principiantes',
-    'volumen': 'Volumen',
-    'resistencia': 'Fuerza Resistencia',
-    'especializacion': 'Especialización'
+    'hipertrofia-hombres': 'Hipertrofia Hombres',
+    'hipertrofia-mujeres': 'Hipertrofia Mujeres',
+    'adaptacion': 'Adaptación',
+    'full-body': 'Full Body',
+    'piernas-gluteos': 'Piernas y Glúteos',
+    'cardio-zona-media': 'Cardio y Zona Media',
   };
 
   const levelTitles = {
@@ -112,7 +109,12 @@ function resaltarPalabras(texto) {
     "WOD 1",
     "WOD 2",
     "Acondicionamiento",
-    "Nota:"
+    "Nota:",
+    "Amrap",
+    "AMRAP",
+    "EMOM",
+    "For time",
+    "Descanso",
   ];
   palabras.forEach(palabra => {
     const regex = new RegExp(palabra, "gi");

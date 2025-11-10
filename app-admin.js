@@ -47,15 +47,12 @@ function getCategoryDisplayName() {
 // Obtener nombre legible de subcategoría
 function getSubcategoryDisplayName() {
   const names = {
-    'hipertrofia': 'Hipertrofia',
-    'fuerza': 'Fuerza',
-    'definicion': 'Definición',
-    'powerlifting': 'Powerlifting',
-    'funcional': 'Funcional',
-    'principiantes': 'Principiantes',
-    'volumen': 'Volumen',
-    'resistencia': 'Fuerza Resistencia',
-    'especializacion': 'Especialización'
+    'hipertrofia-hombres': 'Hipertrofia Hombres',
+    'hipertrofia-mujeres': 'Hipertrofia Mujeres',
+    'adaptacion': 'Adaptación',
+    'full-body': 'Full Body',
+    'piernas-gluteos': 'Piernas y Glúteos',
+    'cardio-zona-media': 'Cardio y Zona Media',
   };
   return names[currentSubcategory] || currentSubcategory;
 }
