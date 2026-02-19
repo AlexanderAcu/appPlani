@@ -11,7 +11,7 @@
 /* ===== Body en blanco (contenido) ===== */
 body {
   font-family: 'Inter', sans-serif;
-  background: #ffffff;     /* ← cuerpo blanco */
+  background: #ffffff;
   color: #18181b;
   min-height: 100vh;
   display: flex;
@@ -351,7 +351,7 @@ footer {
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
-  color: #fff !important ; /* Asegura que el texto sea visible */
+  color: #fff !important;
 }
 
 footer h2 {

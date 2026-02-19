@@ -1,24 +1,29 @@
-// app-public.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-import firebaseConfig from "./firebase-config.js?v=8"; // export default
+import firebaseConfig from "./firebase-config.js?v=8";
+
+console.log('APP-PUBLIC: Loading');
 
 marked.setOptions({ gfm: true, breaks: true });
 
 const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-const $  = s => document.querySelector(s);
+console.log('APP-PUBLIC: Firebase initialized');
+
+const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
 const days = [
   { key:"monday", label:"Lunes", dow:1 },
   { key:"tuesday", label:"Martes", dow:2 },
-  { key:"wednesday", label:"Miércoles", dow:3 },
+  { key:"wednesday", label:"Miercoles", dow:3 },
   { key:"thursday", label:"Jueves", dow:4 },
   { key:"friday", label:"Viernes", dow:5 },
-  { key:"saturday", label:"Sábado", dow:6 }, // sábado
+  { key:"saturday", label:"Sabado", dow:6 }
 ];
 
 let cache = {};
@@ -26,17 +31,15 @@ let currentCategory = "";
 let currentSubcategory = "";
 let currentLevel = "";
 
-// Obtener parámetros de la URL
 function getUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
   return {
-    categoria: urlParams.get('categoria') || 'clase-crossfit', // default
+    categoria: urlParams.get('categoria') || 'clase-crossfit',
     subcategoria: urlParams.get('subcategoria') || null,
     nivel: urlParams.get('nivel') || null
   };
 }
 
-// Generar ID del documento basado en categoría, subcategoría y nivel
 function getDocumentId() {
   const params = getUrlParams();
   currentCategory = params.categoria;
@@ -44,29 +47,28 @@ function getDocumentId() {
   currentLevel = params.nivel;
   
   if (currentLevel && currentSubcategory) {
-    return `${currentCategory}-${currentSubcategory}-${currentLevel}`;
+    return currentCategory + "-" + currentSubcategory + "-" + currentLevel;
   } else if (currentSubcategory) {
-    return `${currentCategory}-${currentSubcategory}`;
+    return currentCategory + "-" + currentSubcategory;
   }
   return currentCategory;
 }
 
-// Obtener título para mostrar en la página
 function getCategoryTitle() {
   const params = getUrlParams();
   const titles = {
     'crossfit-atletas': 'CrossFit Atletas',
     'clase-crossfit': 'Clase CrossFit',
-    'musculacion': 'Musculación'
+    'musculacion': 'Musculacion'
   };
   
   const subcategoryTitles = {
     'hipertrofia-hombres': 'Hipertrofia Hombres',
     'hipertrofia-mujeres': 'Hipertrofia Mujeres',
-    'adaptacion': 'Adaptación',
+    'adaptacion': 'Adaptacion',
     'full-body': 'Full Body',
-    'piernas-gluteos': 'Piernas y Glúteos',
-    'cardio-zona-media': 'Cardio y Zona Media',
+    'piernas-gluteos': 'Piernas y Gluteos',
+    'cardio-zona-media': 'Cardio y Zona Media'
   };
 
   const levelTitles = {
@@ -77,232 +79,206 @@ function getCategoryTitle() {
   
   let title = titles[params.categoria] || 'Planificaciones';
   if (params.subcategoria) {
-    title += ` - ${subcategoryTitles[params.subcategoria] || params.subcategoria}`;
+    title += ' - ' + (subcategoryTitles[params.subcategoria] || params.subcategoria);
   }
   if (params.nivel) {
-    title += ` - ${levelTitles[params.nivel] || params.nivel}`;
+    title += ' - ' + (levelTitles[params.nivel] || params.nivel);
   }
   return title;
 }
 
-function setCurrentMonth(){
-  const el=$("#currentMonth"); if(!el) return;
-  const txt=new Intl.DateTimeFormat("es-AR",{month:"long",year:"numeric"}).format(new Date());
-  el.textContent = txt.charAt(0).toUpperCase()+txt.slice(1);
+function setCurrentMonth() {
+  const el = $("#currentMonth");
+  if (!el) return;
+  const txt = new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric" }).format(new Date());
+  el.textContent = txt.charAt(0).toUpperCase() + txt.slice(1);
 }
 
-function getTodayKey(){
-  const g=new Date().getDay();
-  const f=days.find(d=>d.dow===g);
-  return f? f.key : "monday";
+function getTodayKey() {
+  const g = new Date().getDay();
+  const f = days.find(d => d.dow === g);
+  return f ? f.key : "monday";
 }
-function resaltarPalabras(texto) {
-  const palabras = [
-    "Activación",
-    "Activación Específica",
-    "Bloque De Fuerza",
-    "Gimnásticos",
-    "Gimnástico",
-    "Bloque De Levantamiento",
-    "Accesorios",
-    "WOD",
-    "WOD 1",
-    "WOD 2",
-    "Acondicionamiento",
-    "Nota:",
-    "Amrap",
-    "AMRAP",
-    "EMOM",
-    "For time",
-    "Descanso",
-  ];
-  palabras.forEach(palabra => {
-    const regex = new RegExp(palabra, "gi");
-    texto = texto.replace(regex, match =>
-      `<b style="text-transform:uppercase; text-decoration:underline;">${match}</b>`
-    );
-  });
-  return texto;
-}
-function renderDay(dayKey){
-  $$("[data-day]").forEach(b=>b.classList.remove("tab-active"));
-  document.querySelector(`[data-day="${dayKey}"]`)?.classList.add("tab-active");
-  const md=(cache[dayKey]||"").trim();
-  const html = md ? resaltarPalabras(marked.parse(md))
-                  : `<p class="text-slate-500">Todavía no hay planificación cargada para <b>${days.find(d=>d.key===dayKey)?.label||dayKey}</b>.</p>`;
+
+function renderDay(dayKey) {
+  $$("[data-day]").forEach(b => b.classList.remove("tab-active"));
+  document.querySelector('[data-day="' + dayKey + '"]')?.classList.add("tab-active");
+  const md = (cache[dayKey] || "").trim();
+  const html = md ? marked.parse(md) : '<p>No hay planificacion para este dia</p>';
   $("#studentContent").innerHTML = html;
 }
 
-document.addEventListener("DOMContentLoaded", async ()=>{
-  console.log("[public] projectId:", firebaseConfig.projectId);
-  setCurrentMonth();
-  
-  // Actualizar título de la página
+async function initPublicApp() {
   const titleElement = document.querySelector('.title');
   if (titleElement) {
     titleElement.textContent = getCategoryTitle();
   }
-  
-  // Agregar botón de volver si no estamos en la página principal
-  const params = getUrlParams();
-  if (params.categoria !== 'clase-crossfit' || params.subcategoria || params.nivel) {
-    const header = document.querySelector('header .container');
-    if (header && !header.querySelector('.back-link')) {
-      const backLink = document.createElement('a');
-      
-      // Determinar la URL de retorno
-      if (params.nivel && params.subcategoria) {
-        backLink.href = `niveles.html?categoria=${params.categoria}&subcategoria=${params.subcategoria}`;
-        backLink.textContent = '← Volver a Niveles';
-      } else if (params.subcategoria) {
-        backLink.href = 'musculacion.html';
-        backLink.textContent = '← Volver a Musculación';
-      } else {
-        backLink.href = 'index.html';
-        backLink.textContent = '← Volver al inicio';
-      }
-      
-      backLink.className = 'btn-secondary back-link text-sm sm:text-base';
-      
-      // Texto responsive
-      const fullText = backLink.textContent;
-      const shortText = fullText.replace('Volver a ', '← ').replace('Volver al ', '← ');
-      backLink.innerHTML = `
-        <span class="hidden sm:inline">${fullText}</span>
-        <span class="sm:hidden">${shortText}</span>
-      `;
-      
-      header.appendChild(backLink);
-    }
-  }
 
-  // Tabs
-  const tabs=$("#tabs"); tabs.innerHTML="";
-  days.forEach((d,i)=>{
-    const b=document.createElement("button");
-    b.className=`tab${i===0?" tab-active":""}`; b.textContent=d.label; b.dataset.day=d.key;
-    b.addEventListener("click",()=>renderDay(d.key));
+  const tabs = $("#tabs");
+  tabs.innerHTML = "";
+  days.forEach((d, i) => {
+    const b = document.createElement("button");
+    b.className = "tab" + (i === 0 ? " tab-active" : "");
+    b.textContent = d.label;
+    b.dataset.day = d.key;
+    b.addEventListener("click", () => renderDay(d.key));
     tabs.appendChild(b);
   });
 
-  // Primera lectura + realtime con el documento correcto
   const documentId = getDocumentId();
-  const ref = doc(db,"plans", documentId);
-  console.log("[public] Using document ID:", documentId);
+  const ref = doc(db, "plans", documentId);
+  console.log('Loading plan:', documentId);
   
   const snap0 = await getDoc(ref);
-  cache = snap0.exists()? snap0.data() : {};
-  console.log("[public] first getDoc:", cache);
+  cache = snap0.exists() ? snap0.data() : {};
+  console.log('Plan data:', cache);
   renderDay(getTodayKey());
 
-  onSnapshot(ref, (snap)=>{
-    cache = snap.exists()? snap.data() : {};
-    console.log("[public] onSnapshot:", cache);
+  onSnapshot(ref, (snap) => {
+    cache = snap.exists() ? snap.data() : {};
     const active = document.querySelector(".tab.tab-active")?.dataset.day || getTodayKey();
     renderDay(active);
-  }, (err)=>{
-    console.error("[public] onSnapshot error:", err);
   });
+}
 
-  // MODAL YOUTUBE
-  const modalEjercicio = document.getElementById('modalEjercicio');
-  const btnBuscarEjercicio = document.getElementById('buscarEjercicioBtn');
-  const btnCerrarModal = modalEjercicio.querySelector('.close-modal');
-  const btnBuscarVideo = document.getElementById('btnBuscarVideo');
-  const inputEjercicio = document.getElementById('inputEjercicio');
-  const videoResult = document.getElementById('videoResult');
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log('APP-PUBLIC: DOMContentLoaded');
+  setCurrentMonth();
 
-  btnBuscarEjercicio.addEventListener('click', () => {
-    modalEjercicio.classList.add('active');
-    inputEjercicio.value = '';
-    videoResult.innerHTML = '';
-    inputEjercicio.focus();
-  });
-  btnCerrarModal.addEventListener('click', () => {
-    modalEjercicio.classList.remove('active');
-    videoResult.innerHTML = '';
-  });
-  modalEjercicio.addEventListener('click', (e) => {
-    if (e.target === modalEjercicio) {
-      modalEjercicio.classList.remove('active');
-      videoResult.innerHTML = '';
-    }
-  });
+  // Solo ejecutar si estamos en index.html (que tiene el login)
+  const loginOverlay = document.getElementById('loginPublicOverlay');
+  const dniInput = document.getElementById('dniPublicInput');
+  const dniBtn = document.getElementById('dniPublicBtn');
+  const dniCancel = document.getElementById('dniPublicCancel');
+  const dniMsg = document.getElementById('dniPublicMsg');
+  const logoutPublicBtn = document.getElementById('logoutPublicBtn');
 
-  btnBuscarVideo.addEventListener('click', async () => {
-    const query = inputEjercicio.value.trim();
-    if (!query) return;
-    videoResult.innerHTML = '<p>Buscando videos...</p>';
-    // API YouTube Data v3
-    const apiKey = 'AIzaSyDYBhaDEo1Cgnr8Uh-l2cyoA7_roGOozJg';
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=3&q=${encodeURIComponent(query)}&key=${apiKey}`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.items && data.items.length > 0) {
-        // Muestra miniaturas y títulos para elegir
-        videoResult.innerHTML = data.items.map((item, idx) => {
-          const videoId = item.id.videoId;
-          const title = item.snippet.title;
-          const thumb = item.snippet.thumbnails.medium.url;
-          return `
-            <div class="video-choice" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
-              <img src="${thumb}" alt="${title}" style="width:120px;border-radius:8px;cursor:pointer;" data-video="${videoId}">
-              <button class="btn-primary select-video" data-video="${videoId}" style="margin:0;">Ver</button>
-              <span style="flex:1;">${title}</span>
-            </div>
-          `;
-        }).join('');
-        //seleccionar video
-        videoResult.querySelectorAll('.select-video, img[data-video]').forEach(el => {
-          el.addEventListener('click', e => {
-            const vid = el.getAttribute('data-video');
-            videoResult.innerHTML = `<iframe width="100%" height="250" src="https://www.youtube.com/embed/${vid}" frameborder="0" allowfullscreen></iframe>`;
-          });
-        });
-      } else {
-        videoResult.innerHTML = '<p>No se encontró ningún video para ese ejercicio.</p>';
+  // Si no están los elementos de login, probablemente estamos en planificaciones.html
+  // En ese caso, solo mostrar el contenido si ya está autenticado
+  if (!loginOverlay || !dniBtn) {
+    console.log('APP-PUBLIC: No login elements found, checking for existing auth');
+    const stored = localStorage.getItem('dniAuth');
+    if (stored) {
+      console.log('APP-PUBLIC: User already authenticated, loading plan');
+      try {
+        await signInAnonymously(auth);
+        const ref = doc(db, 'allowed', stored);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          initPublicApp();
+        } else {
+          console.warn('APP-PUBLIC: DNI not found in allowed list');
+          localStorage.removeItem('dniAuth');
+        }
+      } catch (e) {
+        console.error('APP-PUBLIC: Error restoring auth:', e);
       }
-    } catch (err) {
-      videoResult.innerHTML = '<p>Error al buscar el video.</p>';
+    } else {
+      console.log('APP-PUBLIC: No auth found, redirecting to home');
+      window.location.href = 'index.html';
     }
-  });
-  inputEjercicio.addEventListener('keydown', e => {
-    if (e.key === 'Enter') btnBuscarVideo.click();
-  });
-  //FIN MODAL YOUTUBE
+    return;
+  }
 
-  // CALCULADORA DE PORCENTAJE
-  const modalCalculadora = document.getElementById('modalCalculadora');
-  const btnAbrirCalculadora = document.getElementById('abrirCalculadoraBtn');
-  const btnCerrarCalculadora = modalCalculadora.querySelector('.close-modal');
-  const btnCalcularPorcentaje = document.getElementById('btnCalcularPorcentaje');
-  const inputPesoMax = document.getElementById('inputPesoMax');
-  const inputPorcentaje = document.getElementById('inputPorcentaje');
-  const resultadoPorcentaje = document.getElementById('resultadoPorcentaje');
+  function showPublicMsg(msg) {
+    dniMsg.textContent = msg;
+    dniMsg.style.display = msg ? 'block' : 'none';
+  }
 
-  btnAbrirCalculadora.addEventListener('click', () => {
-    modalCalculadora.classList.add('active');
-    inputPesoMax.value = '';
-    inputPorcentaje.value = '';
-    resultadoPorcentaje.textContent = '';
-    inputPesoMax.focus();
-  });
-  btnCerrarCalculadora.addEventListener('click', () => {
-    modalCalculadora.classList.remove('active');
-  });
-  modalCalculadora.addEventListener('click', (e) => {
-    if (e.target === modalCalculadora) modalCalculadora.classList.remove('active');
-  });
-  btnCalcularPorcentaje.addEventListener('click', () => {
-    const peso = parseFloat(inputPesoMax.value);
-    const porc = parseFloat(inputPorcentaje.value);
-    if (isNaN(peso) || isNaN(porc) || peso <= 0 || porc <= 0 || porc > 100) {
-      resultadoPorcentaje.textContent = 'Por favor, ingresa valores válidos.';
+  async function checkDNI(dni) {
+    try {
+      console.log('CHECK DNI:', dni);
+      const ref = doc(db, 'allowed', dni);
+      const snap = await getDoc(ref);
+      console.log('DNI EXISTS:', snap.exists());
+      return snap.exists();
+    } catch (e) {
+      console.error('ERROR checkDNI:', e.message);
+      return false;
+    }
+  }
+
+  function enablePublic(yes) {
+    if (yes) {
+      loginOverlay.style.display = 'none';
+      logoutPublicBtn.style.display = 'inline-block';
+    } else {
+      loginOverlay.style.display = 'flex';
+      logoutPublicBtn.style.display = 'none';
+    }
+  }
+
+  dniBtn.addEventListener('click', async () => {
+    const dni = dniInput.value.trim();
+    showPublicMsg('');
+    
+    if (!dni || dni.length === 0) {
+      console.log('DNI input empty');
+      showPublicMsg('Por favor ingrese un DNI');
       return;
     }
-    const resultado = (peso * porc / 100).toFixed(2);
-    resultadoPorcentaje.textContent = `El peso a usar es: ${resultado} kg`;
+    
+    console.log('Starting login with DNI:', dni);
+    dniBtn.disabled = true;
+    dniBtn.textContent = 'Verificando...';
+    showPublicMsg('Verificando...');
+    
+    try {
+      console.log('LOGIN: Signing in anonymously');
+      await signInAnonymously(auth);
+      console.log('LOGIN: Checking DNI availability');
+      const ok = await checkDNI(dni);
+      
+      if (ok) {
+        console.log('LOGIN: DNI authorized, storing and enabling public');
+        localStorage.setItem('dniAuth', dni);
+        showPublicMsg('Acceso concedido! Cargando...');
+        enablePublic(true);
+        await initPublicApp();
+      } else {
+        console.log('LOGIN: DNI not authorized');
+        await signOut(auth);
+        showPublicMsg('DNI incorrecto. No esta autorizado para acceder.');
+      }
+    } catch (err) {
+      console.error('LOGIN ERROR:', err.code, err.message);
+      showPublicMsg('Error de conexion: ' + err.message);
+    } finally {
+      dniBtn.disabled = false;
+      dniBtn.textContent = 'Entrar';
+    }
   });
-  // FIN CALCULADORA DE PORCENTAJE
+
+  dniCancel.addEventListener('click', () => {
+    dniInput.value = '';
+    showPublicMsg('');
+  });
+
+  logoutPublicBtn.addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+    } catch (e) { }
+    localStorage.removeItem('dniAuth');
+    enablePublic(false);
+  });
+
+  const stored = localStorage.getItem('dniAuth');
+  if (stored) {
+    try {
+      await signInAnonymously(auth);
+      const ok = await checkDNI(stored);
+      if (ok) {
+        enablePublic(true);
+        initPublicApp();
+      } else {
+        localStorage.removeItem('dniAuth');
+        enablePublic(false);
+      }
+    } catch (e) {
+      console.error(e);
+      enablePublic(false);
+    }
+  } else {
+    enablePublic(false);
+  }
 });

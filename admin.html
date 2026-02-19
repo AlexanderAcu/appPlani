@@ -15,7 +15,7 @@
       <div class="flex items-center gap-2 sm:gap-3">
         <img src="logo.png" alt="Logo CF" class="logo">
         <div>
-          <h1 class="title text-lg sm:text-xl lg:text-2xl">Planificacion CF — Admin</h1>
+          <h1 class="title text-lg sm:text-xl lg:text-2xl">Planificacion CF - Admin</h1>
           <p id="currentMonth" class="subtitle text-sm"></p>
         </div>
       </div>
@@ -24,11 +24,52 @@
           <span class="hidden sm:inline">Ver público</span>
           <span class="sm:hidden">Público</span>
         </a>
+        <button id="logoutBtn" class="btn-secondary text-sm sm:text-base" style="display:none">Cerrar sesión</button>
       </div>
     </div>
   </header>
 
   <main class="container space-y-6 pb-16 pt-6">
+    <!-- Gestión de clientes autorizados -->
+    <section class="card space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="section-title">Gestión de clientes autorizados</h2>
+      </div>
+      <p class="muted">Desde aquí podés agregar y quitar clientes (por DNI) que podrán acceder a la parte pública.</p>
+      
+      <!-- Formulario para agregar -->
+      <div class="bg-sky-50 p-4 rounded-lg border border-sky-200">
+        <h3 class="text-base font-semibold mb-3 text-sky-900">Agregar nuevo cliente</h3>
+        <div class="flex gap-2 flex-col sm:flex-row">
+          <input id="allowedDni" class="input" placeholder="DNI (ej: 12345678)" />
+          <input id="allowedName" class="input" placeholder="Nombre (opcional)" />
+          <button id="addAllowedBtn" class="btn-success">Agregar cliente</button>
+        </div>
+      </div>
+
+      <!-- Lista de clientes -->
+      <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+        <h3 class="text-base font-semibold mb-3 text-slate-900">Clientes autorizados</h3>
+        <input id="searchAllowed" class="input w-full mb-3" placeholder="Buscar por DNI o nombre..." />
+        <ul id="allowedList" class="mt-2 space-y-2">
+          <li class="text-slate-500 text-sm italic">Cargando clientes...</li>
+        </ul>
+      </div>
+    </section>
+    <!-- Login overlay -->
+    <div id="loginOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:60;">
+      <div style="background:white;padding:24px;border-radius:8px;max-width:420px;width:90%;box-shadow:0 6px 24px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 8px 0;font-size:20px">Acceso restringido</h3>
+        <p style="margin:0 0 12px 0;color:#555">Accedé con tu cuenta de administrador.</p>
+        <input id="adminEmail" type="email" placeholder="Email" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;margin-bottom:8px" />
+        <input id="adminPass" type="password" placeholder="Contraseña" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;margin-bottom:8px" />
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="adminLoginBtn" class="btn-success">Iniciar sesión</button>
+          <button id="dniCancel" class="btn-secondary">Limpiar</button>
+        </div>
+        <p id="dniMsg" style="margin-top:8px;color:#b91c1c;display:none"></p>
+      </div>
+    </div>
     <section class="card space-y-4">
       <div class="flex items-center justify-between">
         <h2 class="section-title">Editor de Planificaciones</h2>
@@ -50,12 +91,12 @@
         <label class="label min-w-fit">Subcategoría:</label>
         <select id="subcategorySelect" class="input w-full sm:max-w-xs">
           <option value="">— Seleccionar —</option>
-          <option value="hipertrofia hombres">Hipertrofia Hombres</option>
-          <option value="hipertrofia mujeres">Hipertrofia Mujeres</option>
-          <option value="adaptacion">Adaptación</option>
-          <option value="full body">Full Body</option>
-          <option value="piernas y glúteos">Piernas y Glúteos</option>
-          <option value="cardio y zona media">Cardio y Zona Media</option>
+          <option value="hipertrofia-hombres">Hipertrofia Hombres</option>
+          <option value="hipertrofia-mujeres">Hipertrofia Mujeres</option>
+          <option value="adaptacion">Adaptacion</option>
+          <option value="full-body">Full Body</option>
+          <option value="piernas-gluteos">Piernas y Gluteos</option>
+          <option value="cardio-zona-media">Cardio y Zona Media</option>
         </select>
       </div>
 
@@ -123,10 +164,94 @@
             ZonaTech
           </a>
         </p>
-        <p class="text-slate-500 text-sm">📧 zonazeroale10@gmail.com | 📱 +54 9 351 5168272</p>
+        <p class="text-slate-500 text-sm">Correo: zonazeroale10@gmail.com | Telefono: +54 9 351 5168272</p>
       </div>
     </div>
   </footer>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+    import { getAuth, signInAnonymously, signOut, onAuthStateChanged, signInWithEmailAndPassword, getIdTokenResult } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+    import firebaseConfig from './firebase-config.js';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginOverlay = document.getElementById('loginOverlay');
+    const adminEmail = document.getElementById('adminEmail');
+    const adminPass = document.getElementById('adminPass');
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    const dniCancel = document.getElementById('dniCancel');
+    const dniMsg = document.getElementById('dniMsg');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const textarea = document.getElementById('planTextarea');
+    const saveBtn = document.getElementById('saveBtn');
+
+    function showMessage(msg) {
+      dniMsg.textContent = msg;
+      dniMsg.style.display = msg ? 'block' : 'none';
+    }
+
+    function enableAdmin(yes) {
+      if (yes) {
+        loginOverlay.style.display = 'none';
+        textarea.disabled = false;
+        saveBtn.disabled = false;
+        logoutBtn.style.display = 'inline-block';
+        localStorage.setItem('adminAuth', '1');
+        window.__isAdmin = true;
+      } else {
+        loginOverlay.style.display = 'flex';
+        textarea.disabled = true;
+        saveBtn.disabled = true;
+        logoutBtn.style.display = 'none';
+        localStorage.removeItem('adminAuth');
+        window.__isAdmin = false;
+      }
+    }
+
+    // Autenticación admin con Email/Password y verificación de claim 'admin'
+    adminLoginBtn.addEventListener('click', async () => {
+      const email = adminEmail.value.trim();
+      const pass = adminPass.value.trim();
+      showMessage('');
+      if (!email || !pass) { showMessage('Ingrese email y contraseña.'); return; }
+      adminLoginBtn.disabled = true; adminLoginBtn.textContent = 'Verificando...';
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        const idTokenRes = await getIdTokenResult(cred.user);
+        if (idTokenRes.claims && idTokenRes.claims.admin) {
+          enableAdmin(true);
+          showMessage('Autenticado como admin.');
+        } else {
+          await signOut(auth);
+          showMessage('Cuenta no tiene permisos de admin.');
+        }
+      } catch (err) {
+        console.error('admin login error', err);
+        showMessage('Error al iniciar sesión. Revisa credenciales.');
+      } finally {
+        adminLoginBtn.disabled = false; adminLoginBtn.textContent = 'Iniciar sesión';
+      }
+    });
+
+    dniCancel.addEventListener('click', () => { adminEmail.value = ''; adminPass.value = ''; showMessage(''); });
+
+    logoutBtn.addEventListener('click', async () => { 
+      try{ await signOut(auth); }catch(e){ console.warn('signOut failed', e); }
+      localStorage.removeItem('adminAuth'); window.__isAdmin = false; enableAdmin(false); showMessage('Sesión cerrada'); 
+    });
+
+    // On load, restore admin session if present (try to sign in anonymously for public reads)
+    (async function initAuth(){
+      const ok = !!localStorage.getItem('adminAuth');
+      try{ await signInAnonymously(auth); }catch(e){ console.warn('init signInAnonymously', e); }
+      enableAdmin(ok);
+    })();
+  </script>
 
   <script type="module" src="app-admin.js"></script>
 </body>

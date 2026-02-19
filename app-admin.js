@@ -1,10 +1,27 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, getIdTokenResult } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import firebaseConfig from "./firebase-config.js?v=6";
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
+const auth = getAuth(app);
+let isAdmin = false;
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      const idRes = await getIdTokenResult(user);
+      isAdmin = !!(idRes && idRes.claims && idRes.claims.admin);
+    } catch (e) {
+      console.warn('getIdTokenResult failed', e);
+      isAdmin = false;
+    }
+  } else {
+    isAdmin = false;
+  }
+});
 
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -261,6 +278,110 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   selectDay("");
   updateCategoryDisplay();
   $("#saveBtn").addEventListener("click", savePlan);
+
+  // --- Gestión de clientes autorizados ---
+  const allowedDni = document.getElementById('allowedDni');
+  const allowedName = document.getElementById('allowedName');
+  const addAllowedBtn = document.getElementById('addAllowedBtn');
+  const allowedList = document.getElementById('allowedList');
+  const searchAllowed = document.getElementById('searchAllowed');
+  let allAllowedData = {}; // almacena todos los clientes
+
+  function filterAndRender(){
+    const searchTerm = (searchAllowed.value || '').toLowerCase();
+    allowedList.innerHTML = '';
+    const entries = Object.entries(allAllowedData||{}).sort();
+    
+    const filtered = entries.filter(([id, data])=>{
+      return id.toLowerCase().includes(searchTerm) || (data?.name && data.name.toLowerCase().includes(searchTerm));
+    });
+
+    if(filtered.length === 0){
+      allowedList.innerHTML = '<li class="text-slate-500 text-sm italic">No hay clientes que coincidan</li>';
+      return;
+    }
+
+    filtered.forEach(([id, data])=>{
+      const li = document.createElement('li');
+      li.className = 'flex items-center justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-all';
+      li.innerHTML = `
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-slate-900">${id}</div>
+          ${data?.name? `<div class="text-sm text-slate-600">${data.name}</div>` : ''}
+        </div>
+        <button class="btn-secondary remove-allowed whitespace-nowrap" data-id="${id}" style="background-color:#ef4444;border-color:#dc2626;color:white;padding:0.4rem 0.8rem;font-size:0.875rem;">Eliminar</button>
+      `;
+      allowedList.appendChild(li);
+    });
+    allowedList.querySelectorAll('.remove-allowed').forEach(btn => {
+      btn.addEventListener('click', async (e)=>{
+        const id = btn.dataset.id;
+        if(!isAdmin){ toast('Autenticar como admin primero'); return; }
+        if(!confirm(`¿Seguro que quieres eliminar a ${id}?`)) return;
+        btn.disabled = true; btn.textContent = 'Eliminando...';
+        try{
+          await deleteDoc(doc(db, 'allowed', id));
+          toast(`Cliente ${id} eliminado`);
+        }catch(err){ console.error(err); toast('Error al eliminar'); btn.disabled = false; btn.textContent = 'Eliminar'; }
+      });
+    });
+  }
+
+  function renderAllowed(list){
+    allAllowedData = list || {};
+    filterAndRender();
+  }
+
+  searchAllowed?.addEventListener('input', filterAndRender);
+
+  async function loadAllowedOnce(){
+    try{
+      if(!isAdmin){ console.warn('loadAllowedOnce called but not admin'); return; }
+      const snap = await getDocs(collection(db, 'allowed'));
+      const out = {};
+      snap.forEach(d => { out[d.id] = d.data(); });
+      renderAllowed(out);
+    }catch(e){ console.error('loadAllowedOnce', e); }
+  }
+
+  // realtime listener para allowed (solo si es admin)
+  const setupAllowedListener = ()=>{
+    if(!isAdmin){ console.log('setupAllowedListener: not admin yet'); return; }
+    try{
+      const col = collection(db, 'allowed');
+      onSnapshot(col, (qs)=>{
+        const out = {};
+        qs.forEach(d=> out[d.id] = d.data());
+        renderAllowed(out);
+      }, (err)=>{ console.error('[allowed] onSnapshot error:', err); loadAllowedOnce(); });
+    }catch(e){ console.error('[allowed] setup error:', e); loadAllowedOnce(); }
+  };
+
+  // Esperar a que se confirme que es admin antes de cargar clientes
+  const originalLoginSuccess = ()=>{
+    loadAllowedOnce();
+    setupAllowedListener();
+  };
+
+  // Monitorear cambios en isAdmin para cargar clientes cuando se autentica
+  let lastIsAdmin = false;
+  setInterval(()=>{
+    if(isAdmin && !lastIsAdmin){
+      console.log('[admin] Admin autenticado, cargando clientes...');
+      originalLoginSuccess();
+    }
+    lastIsAdmin = isAdmin;
+  }, 500);
+    if(!isAdmin){ toast('Autenticar como admin primero'); return; }
+    const dni = allowedDni.value.trim();
+    const name = allowedName.value.trim();
+    if(!dni){ toast('Ingrese un DNI válido'); return; }
+    try{
+      await setDoc(doc(db,'allowed', dni), { name: name || '', createdAt: Date.now() }, { merge:true });
+      allowedDni.value=''; allowedName.value='';
+      toast(`Agregado ${dni}`);
+    }catch(err){ console.error(err); toast('Error al agregar'); }
+  });
 
   // Atajo Ctrl/Cmd+S para guardar
   document.addEventListener("keydown",(e)=>{
