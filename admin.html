@@ -50,7 +50,10 @@
       <!-- Lista de clientes -->
       <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
         <h3 class="text-base font-semibold mb-3 text-slate-900">Clientes autorizados</h3>
-        <input id="searchAllowed" class="input w-full mb-3" placeholder="Buscar por DNI o nombre..." />
+        <div class="flex gap-2 mb-3">
+          <input id="searchAllowed" class="input flex-1" placeholder="Buscar por DNI o nombre..." />
+          <button id="clearSearchAllowed" class="btn-secondary" title="Limpiar búsqueda">Limpiar</button>
+        </div>
         <ul id="allowedList" class="mt-2 space-y-2">
           <li class="text-slate-500 text-sm italic">Cargando clientes...</li>
         </ul>

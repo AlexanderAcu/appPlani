@@ -372,6 +372,9 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     }
     lastIsAdmin = isAdmin;
   }, 500);
+
+  // Click listener para agregar clienta
+  addAllowedBtn?.addEventListener('click', async ()=>{
     if(!isAdmin){ toast('Autenticar como admin primero'); return; }
     const dni = allowedDni.value.trim();
     const name = allowedName.value.trim();
@@ -381,6 +384,14 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       allowedDni.value=''; allowedName.value='';
       toast(`Agregado ${dni}`);
     }catch(err){ console.error(err); toast('Error al agregar'); }
+  });
+
+  // Click listener para limpiar búsqueda
+  const clearSearchAllowed = document.getElementById('clearSearchAllowed');
+  clearSearchAllowed?.addEventListener('click', ()=>{
+    searchAllowed.value = '';
+    filterAndRender();
+    searchAllowed.focus();
   });
 
   // Atajo Ctrl/Cmd+S para guardar
